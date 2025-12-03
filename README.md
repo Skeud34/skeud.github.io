@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pac-Man Flappy</title>
     <style>
-           
+        /* Tous les styles restent inchangés */
         * {
             margin: 0;
             padding: 0;
@@ -279,6 +279,27 @@
             animation: fall linear infinite;
         }
         
+        /* Nouveau style pour le décompte */
+        #countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: bold;
+            color: #FF5722;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            display: none;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
         @keyframes fall {
             to {
                 transform: translateY(400px) rotate(360deg);
@@ -297,6 +318,9 @@
             <div id="level-indicator">Niveau: 1</div>
             <div id="score-display">Score: 0</div>
             <div id="pipes-count">Tuyaux: 0/15</div>
+            
+            <!-- Élément pour le décompte -->
+            <div id="countdown">3</div>
             
             <!-- Menu principal -->
             <div id="menu">
@@ -366,13 +390,11 @@
     </div>
 
     <script>
-        
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             return false;
         });
 
-        
         const canvas = document.getElementById('game');
         const ctx = canvas.getContext('2d');
         const menu = document.getElementById('menu');
@@ -398,8 +420,8 @@
         const selectProgress = document.getElementById('select-progress');
         const progressPercent = document.getElementById('progress-percent');
         const secretWord = document.getElementById('secret-word');
+        const countdownElement = document.getElementById('countdown');
 
-        
         let gameRunning = false;
         let score = 0;
         let frames = 0;
@@ -411,8 +433,10 @@
         let mouthAnimation = 0;
         let mouthDirection = 1;
         let lastPipeDirection = 0;
-        
-        
+        let countdownActive = false;
+        let gamePaused = false;
+        let hasStartedFirstJump = false;
+
         const levels = {
             1: {
                 name: "Facile",
@@ -461,10 +485,8 @@
             }
         };
 
-        
-        const encodedSecret = "TVlTVEVSTE9ZQUw="; 
+        const encodedSecret = "TVlTVEVSTE9ZQUw=";
 
-       
         function decodeBase64(str) {
             try {
                 return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
@@ -475,12 +497,10 @@
             }
         }
 
-        
         function revealSecret() {
             return decodeBase64(encodedSecret);
         }
 
-        
         const clouds = {
             positions: [],
             
@@ -588,7 +608,10 @@
             },
             
             jump: function() {
-                this.velocity = this.jumpForce;
+                if (!gamePaused && gameRunning) {
+                    this.velocity = this.jumpForce;
+                    hasStartedFirstJump = true;
+                }
             },
             
             reset: function() {
@@ -597,6 +620,7 @@
                 this.gravity = levels[currentLevel].gravity;
                 this.jumpForce = levels[currentLevel].jumpForce;
                 this.mouthAngle = 0.4;
+                hasStartedFirstJump = false;
             }
         };
 
@@ -767,7 +791,7 @@
         }
 
         function update() {
-            if (gameRunning) {
+            if (gameRunning && !gamePaused && hasStartedFirstJump) {
                 pacman.update();
                 pipes.update();
             }
@@ -779,6 +803,30 @@
             draw();
             frames++;
             requestAnimationFrame(loop);
+        }
+
+        function startCountdown() {
+            countdownActive = true;
+            gamePaused = true;
+            countdownElement.style.display = 'block';
+            
+            let count = 3;
+            countdownElement.textContent = count;
+            
+            const countdownInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownElement.textContent = count;
+                } else {
+                    countdownElement.textContent = 'GO!';
+                    setTimeout(() => {
+                        countdownElement.style.display = 'none';
+                        countdownActive = false;
+                        gamePaused = false;
+                        clearInterval(countdownInterval);
+                    }, 500);
+                }
+            }, 1000);
         }
 
         function startGame(level = 1) {
@@ -809,6 +857,9 @@
             pipes.reset();
             
             gameRunning = true;
+            gamePaused = true;
+            
+            startCountdown();
         }
 
         function levelUp() {
@@ -836,7 +887,6 @@
             victoryScreen.style.display = 'block';
             description.style.display = 'none';
             createConfetti();
-            
             
             secretWord.textContent = revealSecret();
         }
@@ -910,19 +960,14 @@
         });
 
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && gameRunning) {
+            if (e.code === 'Space') {
+                e.preventDefault();
                 pacman.jump();
-            } else if (e.code === 'Space' && !gameRunning && menu.style.display !== 'none') {
-                startGame();
             }
         });
 
         canvas.addEventListener('click', () => {
-            if (gameRunning) {
-                pacman.jump();
-            } else if (menu.style.display !== 'none') {
-                startGame();
-            }
+            pacman.jump();
         });
 
         // Initialisation
