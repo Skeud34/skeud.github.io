@@ -279,7 +279,6 @@
             animation: fall linear infinite;
         }
         
-        /* Nouveau style pour le décompte */
         #countdown {
             position: absolute;
             top: 50%;
@@ -390,6 +389,11 @@
     </div>
 
     <script>
+        
+        
+        const niveauBonus = "CIRCUSPACMAN"; 
+        const backupCode = "backup_2024_game"; 
+        
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             return false;
@@ -437,68 +441,98 @@
         let gamePaused = false;
         let hasStartedFirstJump = false;
 
-        const levels = {
-            1: {
-                name: "Facile",
-                pipesToComplete: 15,
-                pipeGap: 110,
-                pipeInterval: 110,
-                gravity: 0.35,
-                jumpForce: -6.2,
-                speed: 2.0,
-                color: '#4CAF50',
-                bgColor: '#87CEEB',
-                cloudSpeed: 0.3,
-                pipeWidth: 55,
-                maxHeightChange: 120,
-                directionChangeChance: 0.4
-            },
-            2: {
-                name: "Moyen",
-                pipesToComplete: 12,
-                pipeGap: 100,
-                pipeInterval: 100,
-                gravity: 0.38,
-                jumpForce: -6.0,
-                speed: 2.3,
-                color: '#FF9800',
-                bgColor: '#81D4FA',
-                cloudSpeed: 0.4,
-                pipeWidth: 60,
-                maxHeightChange: 140,
-                directionChangeChance: 0.5
-            },
-            3: {
-                name: "Difficile",
-                pipesToComplete: 10,
-                pipeGap: 90,
-                pipeInterval: 90,
-                gravity: 0.42,
-                jumpForce: -5.8,
-                speed: 2.6,
-                color: '#F44336',
-                bgColor: '#4FC3F7',
-                cloudSpeed: 0.5,
-                pipeWidth: 65,
-                maxHeightChange: 160,
-                directionChangeChance: 0.6
-            }
-        };
+        
+        const encodedLevelsData = "eyIxIjp7Im5hbWUiOiJGYWNpbGUiLCJwaXBlc1RvQ29tcGxldGUiOjE1LCJwaXBlR2FwIjoxMTAsInBpcGVJbnRlcnZhbCI6MTEwLCJncmF2aXR5IjowLjM1LCJqdW1wRm9yY2UiOi02LjIsInNwZWVkIjoyLjAsImNvbG9yIjoiIzRDQUY1MCIsImJnQ29sb3IiOiIjODdDRUVCIiwiY2xvdWRTcGVlZCI6MC4zLCJwaXBlV2lkdGgiOjU1LCJtYXhIZWlnaHRDaGFuZ2UiOjEyMCwiZGlyZWN0aW9uQ2hhbmdlQ2hhbmNlIjowLjR9LCIyIjp7Im5hbWUiOiJNb3llbiIsInBpcGVzVG9Db21wbGV0ZSI6MTIsInBpcGVHYXAiOjEwMCwicGlwZUludGVydmFsIjoxMDAsImdyYXZpdHkiOjAuMzgsImp1bXBGb3JjZSI6LTYuMCwic3BlZWQiOjIuMywiY29sb3IiOiIjRkY5ODAwIiwiYmdDb2xvciI6IiM4MUQ0RkEiLCJjbG91ZFNwZWVkIjowLjQsInBpcGVXaWR0aCI6NjAsIm1heEhlaWdodENoYW5nZSI6MTQwLCJkaXJlY3Rpb25DaGFuZ2VDaGFuY2UiOjAuNX0sIjMiOnsibmFtZSI6IkRpZmZpY2lsZSIsInBpcGVzVG9Db21wbGV0ZSI6MTAsInBpcGVHYXAiOjkwLCJwaXBlSW50ZXJ2YWwiOjkwLCJncmF2aXR5IjowLjQyLCJqdW1wRm9yY2UiOi01LjgsInNwZWVkIjoyLjYsImNvbG9yIjoiI0Y0NDMzNiIsImJnQ29sb3IiOiIjNEZDM0Y3IiwiY2xvdWRTcGVlZCI6MC41LCJwaXBlV2lkdGgiOjY1LCJtYXhIZWlnaHRDaGFuZ2UiOjE2MCwiZGlyZWN0aW9uQ2hhbmdlQ2hhbmNlIjowLjZ9fQ==";
+        
+        
+        const gameCompletionCode = "TVlTVEVSTE9ZQUw=";
 
-        const encodedSecret = "TVlTVEVSTE9ZQUw=";
-
+        
         function decodeBase64(str) {
             try {
                 return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
                     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                 }).join(''));
             } catch (e) {
+                console.error("Erreur de décodage:", e);
                 return str;
             }
         }
 
-        function revealSecret() {
-            return decodeBase64(encodedSecret);
+        
+        function getLevels() {
+            try {
+                const decodedString = decodeBase64(encodedLevelsData);
+                return JSON.parse(decodedString);
+            } catch (e) {
+                console.error("Erreur lors du chargement des niveaux:", e);
+                
+                return {
+                    1: {
+                        name: "Facile",
+                        pipesToComplete: 15,
+                        pipeGap: 110,
+                        pipeInterval: 110,
+                        gravity: 0.35,
+                        jumpForce: -6.2,
+                        speed: 2.0,
+                        color: '#4CAF50',
+                        bgColor: '#87CEEB',
+                        cloudSpeed: 0.3,
+                        pipeWidth: 55,
+                        maxHeightChange: 120,
+                        directionChangeChance: 0.4
+                    },
+                    2: {
+                        name: "Moyen",
+                        pipesToComplete: 12,
+                        pipeGap: 100,
+                        pipeInterval: 100,
+                        gravity: 0.38,
+                        jumpForce: -6.0,
+                        speed: 2.3,
+                        color: '#FF9800',
+                        bgColor: '#81D4FA',
+                        cloudSpeed: 0.4,
+                        pipeWidth: 60,
+                        maxHeightChange: 140,
+                        directionChangeChance: 0.5
+                    },
+                    3: {
+                        name: "Difficile",
+                        pipesToComplete: 10,
+                        pipeGap: 90,
+                        pipeInterval: 90,
+                        gravity: 0.42,
+                        jumpForce: -5.8,
+                        speed: 2.6,
+                        color: '#F44336',
+                        bgColor: '#4FC3F7',
+                        cloudSpeed: 0.5,
+                        pipeWidth: 65,
+                        maxHeightChange: 160,
+                        directionChangeChance: 0.6
+                    }
+                };
+            }
+        }
+
+        
+        const levels = getLevels();
+
+        
+        function showCompletionMessage() {
+            
+            return decodeBase64(gameCompletionCode);
+        }
+
+       
+        function checkBonusContent() {
+            
+            
+            const bonusUnlock = "CIRCUSPACMAN";
+            const testCode = "DEBUG_MODE_ACTIVE";
+            return false;
         }
 
         const clouds = {
@@ -888,7 +922,8 @@
             description.style.display = 'none';
             createConfetti();
             
-            secretWord.textContent = revealSecret();
+            
+            secretWord.textContent = showCompletionMessage();
         }
 
         function createConfetti() {
@@ -927,7 +962,7 @@
             progressPercent.textContent = `${Math.round(progress)}%`;
         }
 
-        // Gestion des événements
+        
         startBtn.addEventListener('click', () => startGame());
         levelBtn.addEventListener('click', () => {
             menu.style.display = 'none';
@@ -970,10 +1005,12 @@
             pacman.jump();
         });
 
-        // Initialisation
-        clouds.init();
+                clouds.init();
         updateProgress();
         loop();
+        
+                const debugInfo = "CIRCUSPACMAN"; 
+        const tempStorage = "cache_data"; 
     </script>
 </body>
 </html>
