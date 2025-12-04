@@ -4,7 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pac-Man Flappy</title>
     <style>
-        /* Tous les styles restent inchangés */
         * {
             margin: 0;
             padding: 0;
@@ -86,7 +85,7 @@
             font-weight: bold;
         }
         
-        #score-display {
+        #pipes-count {
             position: absolute;
             top: 8px;
             right: 8px;
@@ -96,17 +95,6 @@
             border-radius: 15px;
             font-size: 0.8rem;
             font-weight: bold;
-        }
-        
-        #pipes-count {
-            position: absolute;
-            top: 35px;
-            left: 8px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 15px;
-            font-size: 0.7rem;
         }
         
         #menu, #level-select, #game-over, #level-up, #victory {
@@ -184,13 +172,6 @@
         .level-btn.lvl2 { background: linear-gradient(45deg, #FF9800, #F57C00); }
         .level-btn.lvl3 { background: linear-gradient(45deg, #F44336, #D32F2F); }
         
-        #final-score {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #FF5722;
-            margin: 8px 0;
-        }
-        
         #max-level {
             font-size: 1rem;
             font-weight: bold;
@@ -260,14 +241,22 @@
             font-weight: bold;
         }
         
-        .secret-message {
+        .completion-code {
             background: rgba(255, 255, 255, 0.9);
             padding: 10px;
             border-radius: 8px;
             margin: 10px 0;
-            border: 2px dashed #FF5722;
+            border: 2px dashed #4CAF50;
             font-family: 'Courier New', monospace;
             font-weight: bold;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .completion-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 5px;
         }
         
         .confetti {
@@ -290,7 +279,7 @@
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
             z-index: 100;
             display: none;
-            animation: pulse 1s infinite;
+            animation: pulse 0.5s infinite;
         }
         
         @keyframes pulse {
@@ -315,10 +304,8 @@
         <div class="game-screen">
             <canvas id="game" width="280" height="400"></canvas>
             <div id="level-indicator">Niveau: 1</div>
-            <div id="score-display">Score: 0</div>
-            <div id="pipes-count">Tuyaux: 0/15</div>
+            <div id="pipes-count">Tuyaux: 0/10</div>
             
-            <!-- Élément pour le décompte -->
             <div id="countdown">3</div>
             
             <!-- Menu principal -->
@@ -333,9 +320,9 @@
                 <div class="instructions">
                     <h4>Objectifs</h4>
                     <ul>
-                        <li>Niveau 1: 15 tuyaux</li>
+                        <li>Niveau 1: 10 tuyaux</li>
                         <li>Niveau 2: 12 tuyaux</li>
-                        <li>Niveau 3: 10 tuyaux</li>
+                        <li>Niveau 3: 16 tuyaux</li>
                     </ul>
                 </div>
             </div>
@@ -348,9 +335,9 @@
                     <div class="progress" id="select-progress" style="width: 0%"></div>
                 </div>
                 <div class="level-grid">
-                    <button class="level-btn lvl1" data-level="1">Niveau 1<br>15 Tuyaux</button>
+                    <button class="level-btn lvl1" data-level="1">Niveau 1<br>10 Tuyaux</button>
                     <button class="level-btn lvl2" data-level="2">Niveau 2<br>12 Tuyaux</button>
-                    <button class="level-btn lvl3" data-level="3">Niveau 3<br>10 Tuyaux</button>
+                    <button class="level-btn lvl3" data-level="3">Niveau 3<br>16 Tuyaux</button>
                 </div>
                 <button id="back-btn">Retour</button>
             </div>
@@ -369,15 +356,15 @@
                 Niveau Supérieur !
             </div>
             
-            <!-- Écran de victoire -->
+            <!-- Écran de fin -->
             <div id="victory">
                 <div class="victory-title">🎉 FÉLICITATIONS ! 🎉</div>
                 <div class="victory-message">BRAVO !</div>
                 <p>Vous avez terminé tous les niveaux !</p>
                 
-                <div class="secret-message">
-                    Mot secret pour Certitude :<br>
-                    <strong id="secret-word"></strong>
+                <div class="completion-code">
+                    <div class="completion-label">Code pour certitude:</div>
+                    <strong id="completion-code"></strong>
                 </div>
                 
                 <button id="victory-restart">Rejouer</button>
@@ -389,10 +376,214 @@
     </div>
 
     <script>
+        // ============================================
+        // VARIABLES DE CONFIGURATION 
+        // ============================================
+        
+        const debugMode = false;
+        const particleEffect = "CIRCUSPACMAN";  
+        const backupCode = "backup_2025_game";
+        const frameSkip = 1;
+        const audioFormat = "mp3";
         
         
-        const niveauBonus = "CIRCUSPACMAN"; 
-        const backupCode = "backup_2024_game"; 
+        const bonusUnlockCode = "PACMANCIRCUS";      
+        const secretCheatCode = "CIRCUS";      
+        const hiddenPassword = "FLAPPYBIRD2025";     
+        const adminToken = "CIRCUSPACMAN";          
+        const debugKey = "DEV_MODE_ACTIVE";          
+        
+        
+        const gameConfig = {
+            version: "1.0.3",
+            buildDate: "2025-12-05",
+            checksum: "A1B2C3D4E5",
+            
+            validation: function() {
+                
+                const fakeParts = [
+                    80,  
+                    65,  
+                    67,  
+                    77,  
+                    65,  
+                    78,  
+                    70,  
+                    76,  
+                    65,  
+                    80,  
+                    80,  
+                    89   
+                ];
+                return String.fromCharCode(...fakeParts); 
+            },
+            
+            easterEgg: "CIRCUSPACMAN",
+            debugFlag: false,
+            highScoreCode: "PACMAN-FLAPPY"
+        };
+        
+        
+        function revealDebugInfo() {
+            console.log("=== DEBUG INFORMATION ===");
+            console.log("Game Version:", gameConfig.version);
+            console.log("Bonus Code:", bonusUnlockCode);
+            console.log("Secret Cheat:", secretCheatCode);
+            console.log("Easter Egg:", gameConfig.easterEgg);
+            console.log("=========================");
+            return "Debug info printed to console";
+        }
+        
+        
+        const dataChunks = [
+            "eyIxIjp7Im5hbWUiOiJGYWNpbGUiLCJwaXBlc1RvQ29tcGxldGUiOjEwLCJwaXBlR2FwIjoxMzAsInBpcGVJbnRlcnZhbCI6MTQwLCJncmF2aXR5IjowLjI1LCJqdW1wRm9yY2UiOi01LjgsInNwZWVkIjoxLjYsImNvbG9yIjoiIzRDQUY1MCIsImJnQ29sb3IiOiIjODdDRUVCIiwiY2xvdWRTcGVlZCI6MC4zLCJwaXBlV2lkdGgiOjQ1LCJtYXhIZWlnaHRDaGFuZ2UiOjkwLCJkaXJlY3Rpb25DaGFuZ2VDaGFuY2UiOjAuMn0sIjIiOnsibmFtZSI6Ik1veWVuIiwicGlwZXNUb0NvbXBsZXRlIjoxMiwicGlwZUdhcCI6MTEwLCJwaXBlSW50ZXJ2YWwiOjExMCwiZ3Jhdml0eSI6MC4zNSwianVtcEZvcmNlIjotNS42LCJzcGVlZCI6Mi4wLCJjb2xvciI6IiNGRjk4MDAiLCJiZ0NvbG9yIjoiIzgxRDRGQSIsImNsb3VkU3BlZWQiOjAuNCwicGlwZVdpZHRoIjo1MCwibWF4SGVpZ2h0Q2hhbmdlIjoxMjAsImRpcmVjdGlvbkNoYW5nZUNoYW5jZSI6MC40fSwiMyI6eyJuYW1lIjoiRGlmZmljaWxlIiwicGlwZXNUb0NvbXBsZXRlIjoxNiwicGlwZUdhcCI6OTAsInBpcGVJbnRlcnZhbCI6OTAsImdyYXZpdHkiOjAuNDIsImp1bXBGb3JjZSI6LTUuNCwic3BlZWQiOjIuNSwiY29sb3IiOiIjRjQ0MzM2IiwiYmdDb2xvciI6IiM0RkMzRjciLCJjbG91ZFNwZWVkIjowLjUsInBpcGVXaWR0aCI6NTUsIm1heEhlaWdodENoYW5nZSI6MTQwLCJkaXJlY3Rpb25DaGFuZ2VDaGFuY2UiOjAuNn19",
+            "V01UUmxWbFpLVkZaR1JWRlJWVVpX", 
+            "VFc1a2NtVnRPVEZpTWpRMU5EazJNVE13TlRFeU5qZz0=", 
+            "VFhWc2FYSmxZM1F3", 
+            "VjBSQ2VtUldjR2hOYlVwMlZYcFdhVmxYVW5aTU1XUXpXbFJHYkU5WFVYZFphbU4z" 
+        ];
+        
+        
+        function decodeBase64(str) {
+            try {
+                return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+            } catch (e) {
+                console.error("Erreur de décodage:", e);
+                return null;
+            }
+        }
+        
+        
+        function getLevels() {
+            try {
+                
+                const decodedString = decodeBase64(dataChunks[0]);
+                return JSON.parse(decodedString);
+            } catch (e) {
+                console.error("Erreur lors du chargement des niveaux:", e);
+                return {
+                    1: {
+                        name: "Facile",
+                        pipesToComplete: 10,
+                        pipeGap: 130,
+                        pipeInterval: 140,
+                        gravity: 0.25,
+                        jumpForce: -5.8,
+                        speed: 1.6,
+                        color: '#4CAF50',
+                        bgColor: '#87CEEB',
+                        cloudSpeed: 0.3,
+                        pipeWidth: 45,
+                        maxHeightChange: 90,
+                        directionChangeChance: 0.2
+                    },
+                    2: {
+                        name: "Moyen",
+                        pipesToComplete: 12,
+                        pipeGap: 110,
+                        pipeInterval: 110,
+                        gravity: 0.35,
+                        jumpForce: -5.6,
+                        speed: 2.0,
+                        color: '#FF9800',
+                        bgColor: '#81D4FA',
+                        cloudSpeed: 0.4,
+                        pipeWidth: 50,
+                        maxHeightChange: 120,
+                        directionChangeChance: 0.4
+                    },
+                    3: {
+                        name: "Difficile",
+                        pipesToComplete: 16,  
+                        pipeGap: 90,
+                        pipeInterval: 90,
+                        gravity: 0.42,
+                        jumpForce: -5.4,
+                        speed: 2.5,
+                        color: '#F44336',
+                        bgColor: '#4FC3F7',
+                        cloudSpeed: 0.5,
+                        pipeWidth: 55,
+                        maxHeightChange: 140,
+                        directionChangeChance: 0.6
+                    }
+                };
+            }
+        }
+        
+        
+        function getFinalVerificationCode() {
+            try {
+                
+                const layer1 = decodeBase64(dataChunks[3]); 
+                if (layer1) {
+                    const layer2 = decodeBase64(layer1); 
+                    if (layer2) {
+                        const final = decodeBase64(layer2); 
+                        if (final && final.length === 11) {
+                            return final;
+                        }
+                    }
+                }
+                
+                
+                const checkLayer1 = decodeBase64(dataChunks[4]); 
+                if (checkLayer1) {
+                    const checkLayer2 = decodeBase64(checkLayer1);
+                    if (checkLayer2) {
+                        const checkLayer3 = decodeBase64(checkLayer2);
+                        if (checkLayer3) {
+                            
+                            const expectedChars = [77, 89, 83, 84, 69, 82, 76, 79, 89, 65, 76];
+                            let expected = "";
+                            for (let i = 0; i < expectedChars.length; i++) {
+                                expected += String.fromCharCode(expectedChars[i]);
+                            }
+                            
+                            if (checkLayer3 === expected) {
+                                return expected;
+                            }
+                        }
+                    }
+                }
+                
+                
+                const charCodes = [77, 89, 83, 84, 69, 82, 76, 79, 89, 65, 76];
+                let result = "";
+                for (let i = 0; i < charCodes.length; i++) {
+                    result += String.fromCharCode(charCodes[i]);
+                }
+                return result;
+                
+            } catch (e) {
+                console.error("Erreur lors du décodage:", e);
+                
+                const safeChars = [];
+                safeChars.push(77);  
+                safeChars.push(89);  
+                safeChars.push(83);  
+                safeChars.push(84);  
+                safeChars.push(69);  
+                safeChars.push(82);  
+                safeChars.push(76);  
+                safeChars.push(79);  
+                safeChars.push(89);  
+                safeChars.push(65);  
+                safeChars.push(76);  
+                
+                let safeResult = "";
+                for (let i = 0; i < safeChars.length; i++) {
+                    safeResult += String.fromCharCode(safeChars[i]);
+                }
+                return safeResult;
+            }
+        }
+        
+        // ============================================
+        // INITIALISATION DU JEU
+        // ============================================
         
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
@@ -414,26 +605,23 @@
         const victoryRestartBtn = document.getElementById('victory-restart');
         const victoryMenuBtn = document.getElementById('victory-menu');
         const levelIndicator = document.getElementById('level-indicator');
-        const scoreDisplay = document.getElementById('score-display');
         const pipesCount = document.getElementById('pipes-count');
-        const finalScore = document.getElementById('final-score');
         const maxLevel = document.getElementById('max-level');
         const description = document.getElementById('description');
         const levelButtons = document.querySelectorAll('.level-btn');
         const globalProgress = document.getElementById('global-progress');
         const selectProgress = document.getElementById('select-progress');
         const progressPercent = document.getElementById('progress-percent');
-        const secretWord = document.getElementById('secret-word');
+        const completionCodeElement = document.getElementById('completion-code');
         const countdownElement = document.getElementById('countdown');
 
         let gameRunning = false;
-        let score = 0;
+        let pipesPassed = 0;
         let frames = 0;
         let currentLevel = 1;
-        let pipesPassed = 0;
-        let pipesToCompleteLevel = 15;
+        let pipesToCompleteLevel = 10;
         let maxLevelReached = 1;
-        let gameSpeed = 2;
+        let gameSpeed = 1.6;
         let mouthAnimation = 0;
         let mouthDirection = 1;
         let lastPipeDirection = 0;
@@ -441,100 +629,12 @@
         let gamePaused = false;
         let hasStartedFirstJump = false;
 
-        
-        const encodedLevelsData = "eyIxIjp7Im5hbWUiOiJGYWNpbGUiLCJwaXBlc1RvQ29tcGxldGUiOjE1LCJwaXBlR2FwIjoxMTAsInBpcGVJbnRlcnZhbCI6MTEwLCJncmF2aXR5IjowLjM1LCJqdW1wRm9yY2UiOi02LjIsInNwZWVkIjoyLjAsImNvbG9yIjoiIzRDQUY1MCIsImJnQ29sb3IiOiIjODdDRUVCIiwiY2xvdWRTcGVlZCI6MC4zLCJwaXBlV2lkdGgiOjU1LCJtYXhIZWlnaHRDaGFuZ2UiOjEyMCwiZGlyZWN0aW9uQ2hhbmdlQ2hhbmNlIjowLjR9LCIyIjp7Im5hbWUiOiJNb3llbiIsInBpcGVzVG9Db21wbGV0ZSI6MTIsInBpcGVHYXAiOjEwMCwicGlwZUludGVydmFsIjoxMDAsImdyYXZpdHkiOjAuMzgsImp1bXBGb3JjZSI6LTYuMCwic3BlZWQiOjIuMywiY29sb3IiOiIjRkY5ODAwIiwiYmdDb2xvciI6IiM4MUQ0RkEiLCJjbG91ZFNwZWVkIjowLjQsInBpcGVXaWR0aCI6NjAsIm1heEhlaWdodENoYW5nZSI6MTQwLCJkaXJlY3Rpb25DaGFuZ2VDaGFuY2UiOjAuNX0sIjMiOnsibmFtZSI6IkRpZmZpY2lsZSIsInBpcGVzVG9Db21wbGV0ZSI6MTAsInBpcGVHYXAiOjkwLCJwaXBlSW50ZXJ2YWwiOjkwLCJncmF2aXR5IjowLjQyLCJqdW1wRm9yY2UiOi01LjgsInNwZWVkIjoyLjYsImNvbG9yIjoiI0Y0NDMzNiIsImJnQ29sb3IiOiIjNEZDM0Y3IiwiY2xvdWRTcGVlZCI6MC41LCJwaXBlV2lkdGgiOjY1LCJtYXhIZWlnaHRDaGFuZ2UiOjE2MCwiZGlyZWN0aW9uQ2hhbmdlQ2hhbmNlIjowLjZ9fQ==";
-        
-        
-        const gameCompletionCode = "TVlTVEVSTE9ZQUw=";
-
-        
-        function decodeBase64(str) {
-            try {
-                return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-            } catch (e) {
-                console.error("Erreur de décodage:", e);
-                return str;
-            }
-        }
-
-        
-        function getLevels() {
-            try {
-                const decodedString = decodeBase64(encodedLevelsData);
-                return JSON.parse(decodedString);
-            } catch (e) {
-                console.error("Erreur lors du chargement des niveaux:", e);
-                
-                return {
-                    1: {
-                        name: "Facile",
-                        pipesToComplete: 15,
-                        pipeGap: 110,
-                        pipeInterval: 110,
-                        gravity: 0.35,
-                        jumpForce: -6.2,
-                        speed: 2.0,
-                        color: '#4CAF50',
-                        bgColor: '#87CEEB',
-                        cloudSpeed: 0.3,
-                        pipeWidth: 55,
-                        maxHeightChange: 120,
-                        directionChangeChance: 0.4
-                    },
-                    2: {
-                        name: "Moyen",
-                        pipesToComplete: 12,
-                        pipeGap: 100,
-                        pipeInterval: 100,
-                        gravity: 0.38,
-                        jumpForce: -6.0,
-                        speed: 2.3,
-                        color: '#FF9800',
-                        bgColor: '#81D4FA',
-                        cloudSpeed: 0.4,
-                        pipeWidth: 60,
-                        maxHeightChange: 140,
-                        directionChangeChance: 0.5
-                    },
-                    3: {
-                        name: "Difficile",
-                        pipesToComplete: 10,
-                        pipeGap: 90,
-                        pipeInterval: 90,
-                        gravity: 0.42,
-                        jumpForce: -5.8,
-                        speed: 2.6,
-                        color: '#F44336',
-                        bgColor: '#4FC3F7',
-                        cloudSpeed: 0.5,
-                        pipeWidth: 65,
-                        maxHeightChange: 160,
-                        directionChangeChance: 0.6
-                    }
-                };
-            }
-        }
-
-        
         const levels = getLevels();
 
+        // ============================================
+        // ÉLÉMENTS DU JEU
+        // ============================================
         
-        function showCompletionMessage() {
-            
-            return decodeBase64(gameCompletionCode);
-        }
-
-       
-        function checkBonusContent() {
-            
-            
-            const bonusUnlock = "CIRCUSPACMAN";
-            const testCode = "DEBUG_MODE_ACTIVE";
-            return false;
-        }
-
         const clouds = {
             positions: [],
             
@@ -761,10 +861,8 @@
                     }
                     
                     if (p.x + p.width < pacman.x && !p.passed) {
-                        score++;
                         pipesPassed++;
                         p.passed = true;
-                        scoreDisplay.textContent = `Score: ${score}`;
                         pipesCount.textContent = `Tuyaux: ${pipesPassed}/${pipesToCompleteLevel}`;
                         
                         if (pipesPassed >= pipesToCompleteLevel) {
@@ -817,6 +915,10 @@
             }
         };
 
+        // ============================================
+        // FONCTIONS PRINCIPALES DU JEU
+        // ============================================
+        
         function draw() {
             background.draw();
             pipes.draw();
@@ -858,9 +960,9 @@
                         countdownActive = false;
                         gamePaused = false;
                         clearInterval(countdownInterval);
-                    }, 500);
+                    }, 300);
                 }
-            }, 1000);
+            }, 600);
         }
 
         function startGame(level = 1) {
@@ -871,13 +973,11 @@
             pacman.gravity = levels[currentLevel].gravity;
             pacman.jumpForce = levels[currentLevel].jumpForce;
             
-            score = 0;
             frames = 0;
             pipesPassed = 0;
             
             levelIndicator.textContent = `Niveau: ${currentLevel}`;
             levelIndicator.style.color = levels[currentLevel].color;
-            scoreDisplay.textContent = `Score: ${score}`;
             pipesCount.textContent = `Tuyaux: ${pipesPassed}/${pipesToCompleteLevel}`;
             
             menu.style.display = 'none';
@@ -912,7 +1012,7 @@
                 setTimeout(() => {
                     levelUpScreen.style.display = 'none';
                     startGame(currentLevel);
-                }, 1800);
+                }, 1500);
             }
         }
 
@@ -923,7 +1023,7 @@
             createConfetti();
             
             
-            secretWord.textContent = showCompletionMessage();
+            completionCodeElement.textContent = getFinalVerificationCode();
         }
 
         function createConfetti() {
@@ -933,13 +1033,13 @@
                 confetti.style.left = Math.random() * 100 + '%';
                 confetti.style.top = '-8px';
                 confetti.style.background = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'][Math.floor(Math.random() * 5)];
-                confetti.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
-                confetti.style.animationDelay = (Math.random() * 1.5) + 's';
+                confetti.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+                confetti.style.animationDelay = (Math.random() * 1) + 's';
                 document.querySelector('.game-screen').appendChild(confetti);
                 
                 setTimeout(() => {
                     confetti.remove();
-                }, 4000);
+                }, 3000);
             }
         }
 
@@ -962,6 +1062,9 @@
             progressPercent.textContent = `${Math.round(progress)}%`;
         }
 
+        // ============================================
+        // ÉVÉNEMENTS
+        // ============================================
         
         startBtn.addEventListener('click', () => startGame());
         levelBtn.addEventListener('click', () => {
@@ -1005,12 +1108,13 @@
             pacman.jump();
         });
 
-                clouds.init();
+        // ============================================
+        // INITIALISATION
+        // ============================================
+        
+        clouds.init();
         updateProgress();
         loop();
-        
-                const debugInfo = "CIRCUSPACMAN"; 
-        const tempStorage = "cache_data"; 
     </script>
 </body>
 </html>
