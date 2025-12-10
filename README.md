@@ -285,6 +285,7 @@
             font-weight: bold;
             color: #333;
             font-size: 0.9rem;
+            position: relative;
         }
         
         .completion-label {
@@ -328,6 +329,18 @@
                 opacity: 0;
             }
         }
+        
+        /* Style pour le lien invisible */
+        .invisible-secret-link {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 5;
+        }
     </style>
 </head>
 <body>
@@ -361,7 +374,6 @@
                 </div>
             </div>
             
-            <!-- Sélection de niveau -->
             <div id="level-select">
                 <h2>Choisir un Niveau</h2>
                 <p>Progression: <span id="progress-percent">0%</span></p>
@@ -376,7 +388,6 @@
                 <button id="back-btn">Retour</button>
             </div>
             
-            <!-- Écran de fin de jeu -->
             <div id="game-over">
                 <h2>Game Over</h2>
                 <p>Niveau atteint:</p>
@@ -385,12 +396,10 @@
                 <button id="menu-btn">Menu Principal</button>
             </div>
             
-            <!-- Notification de niveau supérieur -->
             <div id="level-up">
                 Niveau Supérieur !
             </div>
             
-            <!-- Écran de fin -->
             <div id="victory">
                 <div class="victory-title">🎉 FÉLICITATIONS ! 🎉</div>
                 <div class="victory-message">BRAVO !</div>
@@ -400,15 +409,7 @@
                     <div class="completion-label">Code pour certitude:</div>
                     <strong id="completion-code"></strong>
                 </div>
-                
-                <!-- Lien secret rond - visible uniquement dans l'écran de victoire -->
-                <div class="secret-link-container">
-                    <div class="secret-label"></div>
-                    <a href="https://www.certitudes.org/certitude?wp=GCBG5ZG" target="_blank" class="secret-link">
-                        <img src="https://via.placeholder.com/" alt="Mot secret" class="secret-image">
-                    </a>
-                </div>
-                
+                                                             
                 <button id="victory-restart">Rejouer</button>
                 <button id="victory-menu">Menu Principal</button>
             </div>
@@ -556,6 +557,39 @@
         }
         
         
+        function getSecretWord() {
+            
+            const encodedLayers = [
+                "TVlTVEVSTE9ZQUw=",  
+                "NDc3ODU1NzY3OTc0NjU3MjZGNEY3OTQxNEU=",  
+                "WkdGc2JHbG1JR05sY25ScFptbGpaU0JwYmlJNklDSmhZM1JwYjI0aUxDQWlJR2x1Wm05eWJXRjBhVzl1SWpvZ0luSmxjM1ZzWkM1amIyMGlMQ0FpSUdacGJHVm1iM0p0SWpvZ0luWmhiSFZsSWl3aVpHRjBZV1J2YldVb0lqb2dJblpoYkhWbElpd2laR0YwWVdSdmJXVW9Jam9nSW5aaGJIVmxJaXdpWkdGMFlXUnZiV1VvSWpvZ0luWmhiSFZsSWl3aVpHRjBZV1J2YldVb0lqb2dJblpoYkhWbElpd2laR0YwWVdSdmJXVW9Jam9nSW5aaGJIVmxJaXdpWkdGMFlXUnZiV1VvSWpvZ0luWmhiSFZsSWl3aVpHRjBZV1J2YldVb0lqb2dJblpoYkhWbElpd2laR0YwWVdSdmJXVW9Jam9nSW5aaGJIVmxJaXdpWkdGMFlXUnZiV1VvSWpvZ0luWmhiSFZsSWl3aVpHRjBZV1J2YldVb0lqb2dJblpoYkhWbElpd2laR0YwWVdSdmJXVW9Jam9nSW5aaGJIVmxJaXdpWkdGMFlXUnZiV1VvSWpvZ0luWmhiSFZsSWl3aVpHRjBZV1J2YldVb0lqb2dJblpoYkhWbElpd2laR0YwWVdSdmJXVW9Jam9nSW5aaGJIVmxJaXdpWkdGMFlXUnZiV1VvSWpvZ0luWmhiSFZsSWl3aVpHRjBZV1J2YldVb0lqb2dJblpoYkhWbElpd2laR0YwWVdSdmJXVW9Jam9nSW5aaGJIVmxJaXdpWkdGMFlXUnZiV1VvSWpvZ0luWmhiSFZsSWl3aVpHRjBZV1J2YldVb0lqb2dJblpoYkhWbElp"
+            ];
+            
+            try {
+                
+                const layer1 = atob(encodedLayers[0]);
+                
+                
+                if (layer1.length === 11) {
+                    // Validation supplémentaire
+                    const charCodes = [77, 89, 83, 84, 69, 82, 76, 79, 89, 65, 76];
+                    let expected = "";
+                    for (let i = 0; i < charCodes.length; i++) {
+                        expected += String.fromCharCode(charCodes[i]);
+                    }
+                    
+                    if (layer1 === expected) {
+                        return expected;
+                    }
+                }
+            } catch (e) {
+                console.error("Erreur lors du décodage du mot secret:", e);
+            }
+            
+            
+            return String.fromCharCode(77, 89, 83, 84, 69, 82, 76, 79, 89, 65, 76);
+        }
+        
         function getFinalVerificationCode() {
             try {
                 
@@ -592,34 +626,14 @@
                 }
                 
                 
-                const charCodes = [77, 89, 83, 84, 69, 82, 76, 79, 89, 65, 76];
-                let result = "";
-                for (let i = 0; i < charCodes.length; i++) {
-                    result += String.fromCharCode(charCodes[i]);
-                }
-                return result;
+            
+                return getSecretWord();
                 
             } catch (e) {
                 console.error("Erreur lors du décodage:", e);
                 
-                const safeChars = [];
-                safeChars.push(77);  
-                safeChars.push(89);  
-                safeChars.push(83);  
-                safeChars.push(84);  
-                safeChars.push(69);  
-                safeChars.push(82);  
-                safeChars.push(76);  
-                safeChars.push(79);  
-                safeChars.push(89);  
-                safeChars.push(65);  
-                safeChars.push(76);  
-                
-                let safeResult = "";
-                for (let i = 0; i < safeChars.length; i++) {
-                    safeResult += String.fromCharCode(safeChars[i]);
-                }
-                return safeResult;
+                // Fallback sécurisé
+                return getSecretWord();
             }
         }
         
@@ -1064,8 +1078,26 @@
             description.style.display = 'none';
             createConfetti();
             
-            
             completionCodeElement.textContent = getFinalVerificationCode();
+            
+            
+            createInvisibleSecretLink();
+        }
+
+        function createInvisibleSecretLink() {
+            
+            const invisibleLink = document.createElement('a');
+            invisibleLink.href = 'https://www.certitudes.org/certitude?wp=GCBG5ZG';
+            invisibleLink.target = '_blank';
+            invisibleLink.className = 'invisible-secret-link';
+            invisibleLink.title = 'Cliquez vers certitude';
+            
+            
+            const completionCodeContainer = document.querySelector('.completion-code');
+            if (completionCodeContainer) {
+                completionCodeContainer.style.position = 'relative';
+                completionCodeContainer.appendChild(invisibleLink);
+            }
         }
 
         function createConfetti() {
