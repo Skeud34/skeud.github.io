@@ -1,4 +1,3 @@
-```html
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -331,7 +330,7 @@
             }
         }
         
-        .invisible-secret-link {
+           .invisible-secret-link {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -341,12 +340,12 @@
             cursor: pointer;
             z-index: 5;
         }
-    </style> 
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="game-title">
-            
+            <h1>PAC-MAN FLAPPY</h1>
         </div>
         <div class="game-screen">
             <canvas id="game" width="280" height="400"></canvas>
@@ -571,7 +570,7 @@
                 
                 
                 if (layer1.length === 11) {
-                    // Validation supplémentaire
+                    
                     const charCodes = [77, 89, 83, 84, 69, 82, 76, 79, 89, 65, 76];
                     let expected = "";
                     for (let i = 0; i < charCodes.length; i++) {
@@ -632,7 +631,7 @@
             } catch (e) {
                 console.error("Erreur lors du décodage:", e);
                 
-                // Fallback sécurisé
+                
                 return getSecretWord();
             }
         }
