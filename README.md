@@ -341,8 +341,8 @@
             cursor: pointer;
             z-index: 5;
         }
-    </style>
-</head>
+    </style> 
+
 <body>
     <div class="container">
         <div class="game-title">
