@@ -1,3 +1,4 @@
+```html
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -342,7 +343,7 @@
             z-index: 5;
         }
     </style> 
-
+</head>
 <body>
     <div class="container">
         <div class="game-title">
