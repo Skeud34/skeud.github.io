@@ -1,5 +1,4 @@
 <html lang="fr">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pac-Man Flappy</title>
@@ -10,7 +9,7 @@
             box-sizing: border-box;
         }
         
-        body {
+        {
             font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             display: flex;
@@ -341,8 +340,8 @@
             z-index: 5;
         }
     </style>
-</head>
-<body>
+
+
     <div class="container">
         <div class="game-title">
             <h1>PAC-MAN FLAPPY</h1>
