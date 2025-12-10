@@ -31,6 +31,40 @@
             padding: 15px;
         }
         
+        .secret-link-container {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .secret-link {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin: 0 auto;
+        }
+        
+        .secret-link:hover {
+            transform: scale(1.1);
+        }
+        
+        .secret-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #FF5722;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .secret-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
         .game-title {
             text-align: center;
             margin-bottom: 15px;
@@ -365,6 +399,14 @@
                 <div class="completion-code">
                     <div class="completion-label">Code pour certitude:</div>
                     <strong id="completion-code"></strong>
+                </div>
+                
+                <!-- Lien secret rond - visible uniquement dans l'écran de victoire -->
+                <div class="secret-link-container">
+                    <div class="secret-label"></div>
+                    <a href="https://www.certitudes.org/certitude?wp=GCBG5ZG" target="_blank" class="secret-link">
+                        <img src="https://via.placeholder.com/" alt="Mot secret" class="secret-image">
+                    </a>
                 </div>
                 
                 <button id="victory-restart">Rejouer</button>
