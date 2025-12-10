@@ -331,7 +331,6 @@
             }
         }
         
-        /* Style pour le lien invisible */
         .invisible-secret-link {
             position: absolute;
             width: 100%;
@@ -347,7 +346,7 @@
 <body>
     <div class="container">
         <div class="game-title">
-            <h1>PAC-MAN FLAPPY</h1>
+            
         </div>
         <div class="game-screen">
             <canvas id="game" width="280" height="400"></canvas>
